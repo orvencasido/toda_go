@@ -65,7 +65,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
-              blurRadius: 10, // Optimized: reduced blur
+              blurRadius: 10,
               offset: const Offset(0, -2),
             ),
           ],
@@ -109,13 +109,12 @@ class _DashboardHomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      // Optimization: Physics to make scrolling feel better
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           _DashboardHeader(),
-          SizedBox(height: 55),
+          SizedBox(height: 30),
           _BookNowButton(),
           SizedBox(height: 35),
           _SectionTitle(title: 'Safety & Tips'),
@@ -144,86 +143,63 @@ class _DashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          height: 200,
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: DashboardTheme.darkBlue,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 50),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Hello, Joross!', style: DashboardTheme.headerStyle),
-                  Text('Ready for a ride?', style: DashboardTheme.subHeaderStyle),
-                ],
-              ),
-              const CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.blueAccent,
-                child: Icon(Icons.person, color: Colors.white, size: 30),
-              ),
-            ],
-          ),
+    return Container(
+      height: 180, // Increased slightly to accommodate App Title
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            DashboardTheme.darkBlue,
+            Color(0xFF1A237E),
+          ],
         ),
-        const Positioned(
-          bottom: -25,
-          left: 25,
-          right: 25,
-          child: _SearchCard(),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(40),
+          bottomRight: Radius.circular(40),
         ),
-      ],
-    );
-  }
-}
-
-class _SearchCard extends StatelessWidget {
-  const _SearchCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SelectTripScreen()),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 15,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: DashboardTheme.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+      padding: const EdgeInsets.only(top: 20),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'TODA GO',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2.0,
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.search, color: DashboardTheme.darkBlue, size: 28),
-            const SizedBox(width: 15),
-            Text(
-              'Where to?',
-              style: GoogleFonts.poppins(
-                color: Colors.grey[600],
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Hello, Joross!',
+            style: DashboardTheme.headerStyle.copyWith(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.5,
+              color: Colors.white.withOpacity(0.9),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Ready for a ride?',
+            style: DashboardTheme.subHeaderStyle.copyWith(
+              fontSize: 12,
+              color: Colors.white.withOpacity(0.7),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -246,7 +222,7 @@ class _BookNowButton extends StatelessWidget {
           foregroundColor: DashboardTheme.white,
           minimumSize: const Size(double.infinity, 65),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 4, // Optimized: reduced elevation
+          elevation: 4,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -293,33 +269,56 @@ class _InfoCardsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 140,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(left: 25),
-        children: const [
-          _InfoCard(
-            title: 'Ride Safely',
-            description: 'Always wear your helmet and hold on tight during the ride.',
-            color: Color(0xFFE3F2FD),
-            icon: Icons.security_rounded,
-            iconColor: Colors.blue,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      child: Column(
+        children: [
+          Row(
+            children: const [
+              Expanded(
+                child: _InfoCard(
+                  title: 'Ride Safely',
+                  description: 'Always wear your helmet.',
+                  color: Color(0xFFE3F2FD),
+                  icon: Icons.security_rounded,
+                  iconColor: Colors.blue,
+                ),
+              ),
+              SizedBox(width: 15),
+              Expanded(
+                child: _InfoCard(
+                  title: 'Fair Rates',
+                  description: 'Check our fare guide.',
+                  color: Color(0xFFFFF3E0),
+                  icon: Icons.payments_rounded,
+                  iconColor: Colors.orange,
+                ),
+              ),
+            ],
           ),
-          _InfoCard(
-            title: 'Fair Rates',
-            description: 'Check our fare guide to know the standard rates in Tayabas.',
-            color: Color(0xFFFFF3E0),
-            icon: Icons.payments_rounded,
-            iconColor: Colors.orange,
-          ),
-          _InfoCard(
-            title: 'Be Kind',
-            description: 'Treat our drivers with respect and courtesy at all times.',
-            color: Color(0xFFE8F5E9),
-            icon: Icons.favorite_rounded,
-            iconColor: Colors.green,
+          const SizedBox(height: 15),
+          Row(
+            children: const [
+              Expanded(
+                child: _InfoCard(
+                  title: 'Be Kind',
+                  description: 'Respect our drivers.',
+                  color: Color(0xFFE8F5E9),
+                  icon: Icons.favorite_rounded,
+                  iconColor: Colors.green,
+                ),
+              ),
+              SizedBox(width: 15),
+              Expanded(
+                child: _InfoCard(
+                  title: 'Support',
+                  description: 'Contact us anytime.',
+                  color: Color(0xFFF3E5F5),
+                  icon: Icons.help_outline_rounded,
+                  iconColor: Colors.purple,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -345,35 +344,26 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
-      margin: const EdgeInsets.only(right: 15),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  description,
-                  maxLines: 2,
-                  style: const TextStyle(color: Colors.black54, fontSize: 12),
-                ),
-              ],
-            ),
+          Icon(icon, color: iconColor.withOpacity(0.6), size: 30),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
-          const SizedBox(width: 10),
-          Icon(icon, color: iconColor.withOpacity(0.3), size: 45),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            maxLines: 2,
+            style: const TextStyle(color: Colors.black54, fontSize: 11),
+          ),
         ],
       ),
     );
