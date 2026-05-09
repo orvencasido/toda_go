@@ -6,90 +6,108 @@ class PersonalInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color backgroundColor = Color(0xFFBEEBFF);
     const Color darkBlue = Color(0xFF000080);
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top Bar
-          Padding(
-            padding: const EdgeInsets.only(top: 50, left: 20, bottom: 10),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
+          // Modern Header synchronized with Dashboard
+          Container(
+            height: 180,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.person_outline_rounded,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'PERSONAL INFO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button Moved to Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // Title
-                  Text(
-                    'Personal Information',
-                    style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  
-                  // Profile Picture with Camera Icon
-                  Stack(
-                    children: [
-                      const CircleAvatar(
-                        radius: 65,
-                        backgroundColor: Colors.blueAccent,
-                        child: Icon(Icons.person, color: Colors.white, size: 80),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey[300]!, width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.camera_alt_outlined,
-                            color: darkBlue,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
                   // Information Card
                   Container(
                     width: double.infinity,
@@ -99,66 +117,41 @@ class PersonalInfoScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: Column(
-                      children: [
-                        _buildInfoRow(
-                          icon: Icons.person_outline,
+                      children: const [
+                        _InfoRow(
+                          icon: Icons.person_outline_rounded,
                           label: 'Full Name',
                           value: 'JOROSS A. BUERA',
-                          darkBlue: darkBlue,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 15.0),
-                          child: Divider(height: 1, color: Color(0xFFEEEEEE)),
-                        ),
-                        _buildInfoRow(
+                        _InfoDivider(),
+                        _InfoRow(
                           icon: Icons.phone_outlined,
                           label: 'Contact Number',
                           value: '0917 123 4567',
-                          darkBlue: darkBlue,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 15.0),
-                          child: Divider(height: 1, color: Color(0xFFEEEEEE)),
-                        ),
-                        _buildInfoRow(
-                          icon: Icons.mail_outline,
+                        _InfoDivider(),
+                        _InfoRow(
+                          icon: Icons.mail_outline_rounded,
                           label: 'Email',
                           value: 'joross.buera@email.com',
-                          darkBlue: darkBlue,
+                        ),
+                        _InfoDivider(),
+                        _InfoRow(
+                          icon: Icons.location_on_outlined,
+                          label: 'Address',
+                          value: 'Tayabas City, Quezon',
                         ),
                         
-                        const SizedBox(height: 35),
+                        SizedBox(height: 35),
                         
-                        // Edit Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 55,
-                          child: OutlinedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.edit_outlined, color: darkBlue),
-                            label: Text(
-                              'Edit Information',
-                              style: GoogleFonts.poppins(
-                                color: darkBlue,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: darkBlue, width: 2),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
-                          ),
-                        ),
+                        _EditButton(),
                       ],
                     ),
                   ),
@@ -169,33 +162,34 @@ class PersonalInfoScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'ACCOUNT'),
-        ],
-        currentIndex: 2,
-        selectedItemColor: darkBlue,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index != 2) {
-            Navigator.pop(context); // Go back to Dashboard if other tab selected
-          }
-        },
-      ),
     );
   }
+}
 
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color darkBlue,
-  }) {
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const Color darkBlue = Color(0xFF000080);
     return Row(
       children: [
-        Icon(icon, color: darkBlue, size: 30),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: darkBlue.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: darkBlue, size: 24),
+        ),
         const SizedBox(width: 20),
         Expanded(
           child: Column(
@@ -205,14 +199,15 @@ class PersonalInfoScreen extends StatelessWidget {
                 label,
                 style: GoogleFonts.poppins(
                   color: Colors.grey[500],
-                  fontSize: 14,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               Text(
                 value,
                 style: GoogleFonts.poppins(
                   color: darkBlue,
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -220,6 +215,50 @@ class PersonalInfoScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _InfoDivider extends StatelessWidget {
+  const _InfoDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 15.0),
+      child: Divider(height: 1, color: Color(0xFFF5F5F5)),
+    );
+  }
+}
+
+class _EditButton extends StatelessWidget {
+  const _EditButton();
+
+  @override
+  Widget build(BuildContext context) {
+    const Color darkBlue = Color(0xFF000080);
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        icon: const Icon(Icons.edit_rounded, size: 20),
+        label: Text(
+          'Edit Information',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkBlue,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 0,
+        ),
+      ),
     );
   }
 }

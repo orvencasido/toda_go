@@ -17,50 +17,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'Select Language',
-            style: GoogleFonts.poppins(color: darkBlue, fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(color: darkBlue, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                title: Text('English', style: GoogleFonts.poppins()),
-                leading: Radio<String>(
-                  value: 'English',
-                  groupValue: _selectedLanguage,
-                  activeColor: darkBlue,
-                  onChanged: (String? value) {
-                    setState(() {
-                      _selectedLanguage = value!;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'English';
-                  });
+              _LanguageOption(
+                label: 'English',
+                value: 'English',
+                groupValue: _selectedLanguage,
+                activeColor: darkBlue,
+                onChanged: (String? value) {
+                  setState(() => _selectedLanguage = value!);
                   Navigator.pop(context);
                 },
               ),
-              ListTile(
-                title: Text('Tagalog', style: GoogleFonts.poppins()),
-                leading: Radio<String>(
-                  value: 'Tagalog',
-                  groupValue: _selectedLanguage,
-                  activeColor: darkBlue,
-                  onChanged: (String? value) {
-                    setState(() {
-                      _selectedLanguage = value!;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'Tagalog';
-                  });
+              _LanguageOption(
+                label: 'Tagalog',
+                value: 'Tagalog',
+                groupValue: _selectedLanguage,
+                activeColor: darkBlue,
+                onChanged: (String? value) {
+                  setState(() => _selectedLanguage = value!);
                   Navigator.pop(context);
                 },
               ),
@@ -73,186 +54,291 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color backgroundColor = Color(0xFFBEEBFF);
     const Color darkBlue = Color(0xFF000080);
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top Bar
-          Padding(
-            padding: const EdgeInsets.only(top: 50, left: 20, bottom: 10),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
+          // Modern Header synchronized with Dashboard
+          Container(
+            height: 180,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.settings_outlined,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'SETTINGS',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button Moved to Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: Column(
-                children: [
-                  // Title
-                  Text(
-                    'Settings',
-                    style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                  
-                  // Settings Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // Notifications
-                        ListTile(
-                          leading: const Icon(Icons.notifications_none, color: darkBlue, size: 28),
-                          title: Text(
-                            'Notifications',
-                            style: GoogleFonts.poppins(
-                              color: darkBlue,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          trailing: Switch(
-                            value: _notificationsEnabled,
-                            activeColor: darkBlue,
-                            onChanged: (value) {
-                              setState(() {
-                                _notificationsEnabled = value;
-                              });
-                            },
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Notifications Switch
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: ListTile(
+                        leading: _SettingIcon(icon: Icons.notifications_none_rounded, color: darkBlue),
+                        title: Text(
+                          'Notifications',
+                          style: GoogleFonts.poppins(
+                            color: darkBlue,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const Divider(height: 1, indent: 60),
-                        
-                        // Language
-                        _buildSettingsItem(
-                          icon: Icons.language_outlined,
-                          title: 'Language',
-                          trailingText: _selectedLanguage,
-                          darkBlue: darkBlue,
-                          onTap: () => _showLanguageDialog(darkBlue),
+                        trailing: Switch.adaptive(
+                          value: _notificationsEnabled,
+                          activeColor: darkBlue,
+                          onChanged: (value) => setState(() => _notificationsEnabled = value),
                         ),
-                        const Divider(height: 1, indent: 60),
-                        
-                        // About
-                        _buildSettingsItem(
-                          icon: Icons.info_outline,
-                          title: 'About',
-                          darkBlue: darkBlue,
-                        ),
-                        const Divider(height: 1, indent: 60),
-                        
-                        // Privacy Policy
-                        _buildSettingsItem(
-                          icon: Icons.shield_outlined,
-                          title: 'Privacy Policy',
-                          darkBlue: darkBlue,
-                        ),
-                        const Divider(height: 1, indent: 60),
-                        
-                        // Terms & Conditions
-                        _buildSettingsItem(
-                          icon: Icons.description_outlined,
-                          title: 'Terms & Conditions',
-                          darkBlue: darkBlue,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
+                    const _SettingsDivider(),
+                    
+                    // Language Selection
+                    _SettingsTile(
+                      icon: Icons.language_rounded,
+                      title: 'Language',
+                      trailingText: _selectedLanguage,
+                      onTap: () => _showLanguageDialog(darkBlue),
+                    ),
+                    const _SettingsDivider(),
+                    
+                    // About
+                    const _SettingsTile(
+                      icon: Icons.info_outline_rounded,
+                      title: 'About',
+                    ),
+                    const _SettingsDivider(),
+                    
+                    // Privacy Policy
+                    const _SettingsTile(
+                      icon: Icons.shield_outlined,
+                      title: 'Privacy Policy',
+                    ),
+                    const _SettingsDivider(),
+                    
+                    // Terms & Conditions
+                    const _SettingsTile(
+                      icon: Icons.description_outlined,
+                      title: 'Terms & Conditions',
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'ACCOUNT'),
-        ],
-        currentIndex: 2,
-        selectedItemColor: darkBlue,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index != 2) {
-            Navigator.pop(context); // Go back to Dashboard if other tab selected
-          }
-        },
+    );
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? trailingText;
+  final VoidCallback? onTap;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.trailingText,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const Color darkBlue = Color(0xFF000080);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: ListTile(
+        leading: _SettingIcon(icon: icon, color: darkBlue),
+        title: Text(
+          title,
+          style: GoogleFonts.poppins(
+            color: darkBlue,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (trailingText != null)
+              Text(
+                trailingText!,
+                style: GoogleFonts.poppins(
+                  color: Colors.blue[700],
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            const SizedBox(width: 8),
+            Icon(Icons.chevron_right_rounded, color: darkBlue.withOpacity(0.3)),
+          ],
+        ),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }
+}
 
-  Widget _buildSettingsItem({
-    required IconData icon,
-    required String title,
-    required Color darkBlue,
-    String? trailingText,
-    VoidCallback? onTap,
-  }) {
+class _SettingIcon extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+
+  const _SettingIcon({required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Icon(icon, color: color, size: 24),
+    );
+  }
+}
+
+class _SettingsDivider extends StatelessWidget {
+  const _SettingsDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      indent: 65,
+      endIndent: 20,
+      color: Colors.grey[50],
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  final String label;
+  final String value;
+  final String groupValue;
+  final Color activeColor;
+  final ValueChanged<String?> onChanged;
+
+  const _LanguageOption({
+    required this.label,
+    required this.value,
+    required this.groupValue,
+    required this.activeColor,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: darkBlue, size: 28),
-      title: Text(
-        title,
-        style: GoogleFonts.poppins(
-          color: darkBlue,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
+      title: Text(label, style: GoogleFonts.poppins(fontSize: 15)),
+      leading: Radio<String>(
+        value: value,
+        groupValue: groupValue,
+        activeColor: activeColor,
+        onChanged: onChanged,
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (trailingText != null)
-            Text(
-              trailingText,
-              style: GoogleFonts.poppins(
-                color: Colors.blueAccent,
-                fontSize: 14,
-              ),
-            ),
-          const SizedBox(width: 10),
-          Icon(Icons.chevron_right, color: darkBlue),
-        ],
-      ),
-      onTap: onTap ?? () {},
+      onTap: () => onChanged(value),
     );
   }
 }

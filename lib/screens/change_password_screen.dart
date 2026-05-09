@@ -27,54 +27,108 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color backgroundColor = Color(0xFFBEEBFF);
     const Color darkBlue = Color(0xFF000080);
-    const Color buttonBlue = Color(0xFF1A237E);
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top Bar
-          Padding(
-            padding: const EdgeInsets.only(top: 50, left: 20, bottom: 10),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
+          // Modern Header synchronized with Dashboard
+          Container(
+            height: 180,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.lock_outline_rounded,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'CHANGE PASSWORD',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button Moved to Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // Title
-                  Text(
-                    'Change Password',
-                    style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  
                   // Form Card
                   Container(
                     width: double.infinity,
@@ -84,7 +138,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -93,30 +147,27 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildPasswordField(
+                        _PasswordField(
                           label: 'Current Password',
                           hint: 'Enter current password',
                           controller: _currentController,
                           isObscured: _obscureCurrent,
-                          darkBlue: darkBlue,
                           onToggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
                         ),
-                        const SizedBox(height: 25),
-                        _buildPasswordField(
+                        const SizedBox(height: 20),
+                        _PasswordField(
                           label: 'New Password',
                           hint: 'Enter new password',
                           controller: _newController,
                           isObscured: _obscureNew,
-                          darkBlue: darkBlue,
                           onToggle: () => setState(() => _obscureNew = !_obscureNew),
                         ),
-                        const SizedBox(height: 25),
-                        _buildPasswordField(
+                        const SizedBox(height: 20),
+                        _PasswordField(
                           label: 'Confirm New Password',
                           hint: 'Confirm new password',
                           controller: _confirmController,
                           isObscured: _obscureConfirm,
-                          darkBlue: darkBlue,
                           onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
                         ),
                         
@@ -129,21 +180,25 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Password Updated Successfully')),
+                                const SnackBar(
+                                  content: Text('Password Updated Successfully'),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: darkBlue,
+                                ),
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: buttonBlue,
+                              backgroundColor: darkBlue,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
-                              elevation: 2,
+                              elevation: 0,
                             ),
                             child: Text(
                               'Update Password',
                               style: GoogleFonts.poppins(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -159,32 +214,28 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'ACCOUNT'),
-        ],
-        currentIndex: 2,
-        selectedItemColor: darkBlue,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index != 2) {
-            Navigator.pop(context); // Go back to Dashboard if other tab selected
-          }
-        },
-      ),
     );
   }
+}
 
-  Widget _buildPasswordField({
-    required String label,
-    required String hint,
-    required TextEditingController controller,
-    required bool isObscured,
-    required Color darkBlue,
-    required VoidCallback onToggle,
-  }) {
+class _PasswordField extends StatelessWidget {
+  final String label;
+  final String hint;
+  final TextEditingController controller;
+  final bool isObscured;
+  final VoidCallback onToggle;
+
+  const _PasswordField({
+    required this.label,
+    required this.hint,
+    required this.controller,
+    required this.isObscured,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const Color darkBlue = Color(0xFF000080);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -192,7 +243,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           label,
           style: GoogleFonts.poppins(
             color: darkBlue,
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -200,25 +251,26 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         TextField(
           controller: controller,
           obscureText: isObscured,
-          style: GoogleFonts.poppins(fontSize: 14),
+          style: GoogleFonts.poppins(fontSize: 14, color: darkBlue),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            fillColor: Colors.grey[50],
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!, width: 1.5),
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: Colors.grey[100]!, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.blueAccent, width: 1.5),
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: darkBlue, width: 1.5),
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 isObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                color: Colors.grey[600],
+                color: Colors.grey[400],
+                size: 20,
               ),
               onPressed: onToggle,
             ),

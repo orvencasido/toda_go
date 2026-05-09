@@ -144,7 +144,7 @@ class _DashboardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 180, // Increased slightly to accommodate App Title
+      height: 180, 
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -167,39 +167,61 @@ class _DashboardHeader extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.only(top: 20),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'TODA GO',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.0,
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      child: SafeArea(
+        child: Row(
+          children: [
+            // Left-aligned Logo
+            Container(
+              height: 115,
+              width: 115,
+              padding: const EdgeInsets.all(5),
+              child: Image.asset(
+                'assets/images/toda_go_white.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.electric_rickshaw_rounded,
+                  size: 60,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Hello, Joross!',
-            style: DashboardTheme.headerStyle.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.5,
-              color: Colors.white.withOpacity(0.9),
+            const SizedBox(width: 10),
+            // Welcome Text
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TODA GO',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  Text(
+                    'Hello, Joross!',
+                    style: DashboardTheme.headerStyle.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                  Text(
+                    'Ready for a ride?',
+                    style: DashboardTheme.subHeaderStyle.copyWith(
+                      fontSize: 11,
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            'Ready for a ride?',
-            style: DashboardTheme.subHeaderStyle.copyWith(
-              fontSize: 12,
-              color: Colors.white.withOpacity(0.7),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -226,10 +248,22 @@ class _BookNowButton extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.electric_rickshaw_rounded, size: 32),
-            SizedBox(width: 15),
-            Text(
+          children: [
+            SizedBox(
+              height: 35,
+              width: 35,
+              child: Image.asset(
+                'assets/images/toda_go_white.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.electric_rickshaw_rounded,
+                  size: 32,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 15),
+            const Text(
               'BOOK A TRICYCLE',
               style: TextStyle(
                 fontSize: 18,
