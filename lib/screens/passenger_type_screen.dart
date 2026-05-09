@@ -11,15 +11,15 @@ class PassengerTypeScreen extends StatefulWidget {
 
 class _PassengerTypeScreenState extends State<PassengerTypeScreen> {
   final Map<String, bool> _selectedTypes = {
-    'Senior Citizens': true,
-    'Student': true,
+    'Senior Citizens': false,
+    'Student': false,
     'PWD': false,
-    'Regular': false,
+    'Regular': true,
   };
 
   final Map<String, int> _quantities = {
-    'Senior Citizens': 2,
-    'Student': 2,
+    'Senior Citizens': 1,
+    'Student': 1,
     'PWD': 1,
     'Regular': 1,
   };
@@ -37,93 +37,188 @@ class _PassengerTypeScreenState extends State<PassengerTypeScreen> {
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
-    const Color backgroundColor = Color(0xFFBEEBFF);
-    const Color confirmGreen = Color(0xFF00C853);
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top bar
+          // Modern Header synchronized with Dashboard
           Container(
-            height: 120,
+            height: 180,
             width: double.infinity,
-            color: darkBlue,
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.electric_rickshaw_rounded,
+                        size: 60,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'PASSENGERS',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button on Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
+                  const SizedBox(height: 10),
                   Text(
-                    'Choose Type of Passenger',
+                    'Select passenger types and quantities',
                     style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      color: darkBlue.withOpacity(0.6),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  const SizedBox(height: 25),
+                  
+                  _buildPassengerCard('Regular', Icons.person_outline_rounded),
+                  const SizedBox(height: 16),
+                  _buildPassengerCard('Student', Icons.school_outlined),
+                  const SizedBox(height: 16),
+                  _buildPassengerCard('Senior Citizens', Icons.elderly_rounded),
+                  const SizedBox(height: 16),
+                  _buildPassengerCard('PWD', Icons.accessible_rounded),
+                  
                   const SizedBox(height: 30),
                   
-                  _buildPassengerCategory('Senior Citizens', darkBlue),
-                  const SizedBox(height: 20),
-                  _buildPassengerCategory('Student', darkBlue),
-                  const SizedBox(height: 20),
-                  _buildPassengerCategory('PWD', darkBlue),
-                  const SizedBox(height: 20),
-                  _buildPassengerCategory('Regular', darkBlue),
+                  // Total Count Display
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: darkBlue.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Passengers:',
+                          style: GoogleFonts.poppins(
+                            color: darkBlue,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '$_totalCount / 4',
+                          style: GoogleFonts.poppins(
+                            color: darkBlue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   
                   // CONFIRM Button
                   SizedBox(
-                    width: 240,
-                    height: 54,
+                    width: double.infinity,
+                    height: 60,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: _totalCount > 0 ? () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const PickupDropoffScreen(),
                           ),
-                                );
-                      },
+                        );
+                      } : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: confirmGreen,
+                        backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                         elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
+                        disabledBackgroundColor: Colors.grey[300],
                       ),
                       child: Text(
-                        'CONFIRM',
+                        'CONTINUE',
                         style: GoogleFonts.poppins(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 1.1,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
@@ -138,112 +233,140 @@ class _PassengerTypeScreenState extends State<PassengerTypeScreen> {
     );
   }
 
-  Widget _buildPassengerCategory(String title, Color darkBlue) {
+  Widget _buildPassengerCard(String title, IconData icon) {
+    const Color darkBlue = Color(0xFF000080);
     bool isSelected = _selectedTypes[title] ?? false;
-    int currentQty = _quantities[title] ?? 1;
+    int quantity = _quantities[title] ?? 1;
 
-    return Column(
-      children: [
-        // Category Selection Pill
-        GestureDetector(
-          onTap: () {
-            if (!isSelected && _totalCount >= 4) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Maximum of 4 passengers allowed')),
-              );
-              return;
-            }
-            setState(() {
-              _selectedTypes[title] = !isSelected;
-              // If selecting a new category and it would exceed 4, reset it to 1
-              if (!isSelected && _totalCount > 4) {
-                _quantities[title] = 1;
-              }
-            });
-          },
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.black, width: 1.5),
+    return GestureDetector(
+      onTap: () {
+        if (!isSelected && _totalCount >= 4) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Maximum of 4 passengers allowed'),
+              behavior: SnackBarBehavior.floating,
             ),
-            child: Row(
+          );
+          return;
+        }
+        setState(() {
+          _selectedTypes[title] = !isSelected;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? darkBlue : Colors.transparent,
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected ? darkBlue.withOpacity(0.1) : Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
               children: [
                 Container(
-                  width: 24,
-                  height: 24,
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: darkBlue,
-                    shape: BoxShape.circle,
+                    color: isSelected ? darkBlue.withOpacity(0.05) : Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: isSelected 
-                    ? const Icon(Icons.check, color: Colors.greenAccent, size: 18) 
-                    : null,
+                  child: Icon(
+                    icon,
+                    color: isSelected ? darkBlue : Colors.grey[400],
+                    size: 24,
+                  ),
                 ),
+                const SizedBox(width: 15),
                 Expanded(
                   child: Text(
                     title,
-                    textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       color: darkBlue,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                const SizedBox(width: 24), // Spacer to balance the leading icon
+                if (isSelected)
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: darkBlue,
+                    size: 20,
+                  ),
               ],
             ),
-          ),
-        ),
-        
-        const SizedBox(height: 10),
-        
-        // Quantity Selectors
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [1, 2, 3, 4].map((num) {
-            bool isNumSelected = isSelected && currentQty == num;
-            
-            // Logic to disable numbers that would exceed total count of 4
-            int totalWithoutThis = _totalCount - (isSelected ? currentQty : 0);
-            bool canSelect = isSelected && (totalWithoutThis + num <= 4);
-            
-            return GestureDetector(
-              onTap: canSelect ? () {
-                setState(() {
-                  _quantities[title] = num;
-                });
-              } : null,
-              child: Container(
-                width: 50,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: isNumSelected 
-                    ? Colors.green 
-                    : (canSelect ? Colors.white : Colors.grey[300]),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    color: canSelect || isNumSelected ? Colors.black : Colors.grey[400]!, 
-                    width: 1.5
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  num.toString(),
-                  style: GoogleFonts.poppins(
-                    color: canSelect || isNumSelected ? darkBlue : Colors.grey[600],
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            if (isSelected) ...[
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
+                child: Divider(height: 1),
               ),
-            );
-          }).toList(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Quantity',
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      _buildQtyBtn(title, -1, quantity > 1),
+                      const SizedBox(width: 15),
+                      Text(
+                        quantity.toString(),
+                        style: GoogleFonts.poppins(
+                          color: darkBlue,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      _buildQtyBtn(title, 1, _totalCount < 4),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildQtyBtn(String title, int delta, bool enabled) {
+    const Color darkBlue = Color(0xFF000080);
+    return GestureDetector(
+      onTap: enabled ? () {
+        setState(() {
+          _quantities[title] = (_quantities[title] ?? 1) + delta;
+        });
+      } : null,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: enabled ? darkBlue : Colors.grey[200],
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          delta > 0 ? Icons.add : Icons.remove,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
     );
   }
 }

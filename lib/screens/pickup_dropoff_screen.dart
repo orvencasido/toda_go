@@ -22,11 +22,7 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
 
   void _calculateFare() {
     if (_pickupAddress != 'Select Pick-up Location' && _dropoffAddress != 'Select Drop-off Location') {
-      // Simulate distance between 1 and 15 km if both selected
-      // In a real app, this would use Geolocator.distanceBetween
       _distance = 6.5; 
-      
-      // Logic: 15 PHP for first 5km, +2 PHP per additional 1km
       if (_distance <= 5) {
         _tripFare = 15;
       } else {
@@ -38,115 +34,116 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
-    const Color backgroundColor = Color(0xFFBEEBFF);
-    const Color confirmGreen = Color(0xFF00C853);
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top bar
+          // Modern Header synchronized with Dashboard
           Container(
-            height: 120,
+            height: 180,
             width: double.infinity,
-            color: darkBlue,
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  'Pick-up & Drop-off',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.electric_rickshaw_rounded,
+                        size: 60,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'LOCATION',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button on Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // Pick-up Card
-                  _buildLocationCard(
-                    label: 'Pick up',
-                    title: _pickupAddress,
-                    subtitle: _pickupSub,
-                    icon: Icons.location_on,
-                    darkBlue: darkBlue,
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MapPickerScreen(title: 'Pick-up'),
-                        ),
-                      );
-                      if (result != null && result is Map<String, String>) {
-                        setState(() {
-                          _pickupAddress = result['address']!;
-                          _pickupSub = result['sub']!;
-                          _calculateFare();
-                        });
-                      }
-                    },
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Drop-off Card
-                  _buildLocationCard(
-                    label: 'Drop off',
-                    title: _dropoffAddress,
-                    subtitle: _dropoffSub,
-                    icon: Icons.location_on,
-                    darkBlue: darkBlue,
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MapPickerScreen(title: 'Drop-off'),
-                        ),
-                      );
-                      if (result != null && result is Map<String, String>) {
-                        setState(() {
-                          _dropoffAddress = result['address']!;
-                          _dropoffSub = result['sub']!;
-                          _calculateFare();
-                        });
-                      }
-                    },
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Fare Section
+                  // Location Input Section
                   Container(
-                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -154,43 +151,133 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                     ),
                     child: Column(
                       children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                        _buildLocationItem(
+                          icon: Icons.my_location_rounded,
+                          iconColor: Colors.blue,
+                          label: 'Pick-up',
+                          address: _pickupAddress,
+                          sub: _pickupSub,
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MapPickerScreen(title: 'Pick-up'),
+                              ),
+                            );
+                            if (result != null && result is Map<String, String>) {
+                              setState(() {
+                                _pickupAddress = result['address']!;
+                                _pickupSub = result['sub']!;
+                                _calculateFare();
+                              });
+                            }
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 45, top: 5, bottom: 5),
+                          child: Container(
+                            height: 30,
+                            width: 1.5,
+                            color: Colors.grey[200],
+                          ),
+                        ),
+                        _buildLocationItem(
+                          icon: Icons.location_on_rounded,
+                          iconColor: Colors.redAccent,
+                          label: 'Drop-off',
+                          address: _dropoffAddress,
+                          sub: _dropoffSub,
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MapPickerScreen(title: 'Drop-off'),
+                              ),
+                            );
+                            if (result != null && result is Map<String, String>) {
+                              setState(() {
+                                _dropoffAddress = result['address']!;
+                                _dropoffSub = result['sub']!;
+                                _calculateFare();
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 30),
+                  
+                  // Estimated Fare Card
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
                           child: Text(
-                            'Estimated Fare',
+                            'Fare Estimation',
                             style: GoogleFonts.poppins(
                               color: darkBlue,
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        const Divider(height: 1, thickness: 1.5),
-                        
-                        _buildFareRow('Trip Fare:', 'PHP $_tripFare', darkBlue),
-                        const Divider(height: 1, thickness: 1.5),
-                        
-                        _buildFareRow('Door-to-Door:', 'PHP $_doorToDoorFare', darkBlue),
+                        const Divider(height: 1),
+                        _buildFareRow('Trip Fare', '₱$_tripFare'),
+                        const Divider(height: 1, indent: 20, endIndent: 20),
+                        _buildFareRow('Service Fee', '₱$_doorToDoorFare'),
                         
                         if (_distance > 0)
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: Text(
-                              'Estimated Distance: ${_distance.toStringAsFixed(1)} km',
-                              style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 13),
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: darkBlue.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.route_rounded, size: 16, color: darkBlue),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Distance: ${_distance.toStringAsFixed(1)} km',
+                                    style: GoogleFonts.poppins(
+                                      color: darkBlue,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                       ],
                     ),
                   ),
                   
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 40),
                   
-                  // Confirm Button
+                  // CONTINUE Button
                   SizedBox(
-                    width: 240,
-                    height: 54,
+                    width: double.infinity,
+                    height: 60,
                     child: ElevatedButton(
                       onPressed: (_tripFare > 0) ? () {
                         Navigator.push(
@@ -204,23 +291,26 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                         );
                       } : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: confirmGreen,
+                        backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                         elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
                         disabledBackgroundColor: Colors.grey[300],
                       ),
                       child: Text(
-                        'Confirm',
+                        'CONTINUE',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -230,30 +320,30 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
     );
   }
 
-  Widget _buildLocationCard({
+  Widget _buildLocationItem({
+    required IconData icon,
+    required Color iconColor,
     required String label,
-    required String title,
-    required String subtitle,
-    required Color darkBlue,
+    required String address,
+    required String sub,
     required VoidCallback onTap,
-    IconData? icon,
   }) {
+    const Color darkBlue = Color(0xFF000080);
+    bool isPlaceholder = address.contains('Select');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.grey[50],
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey[300]!, width: 1),
+          border: Border.all(color: Colors.grey[100]!),
         ),
         child: Row(
           children: [
-            if (icon != null) ...[
-              Icon(icon, color: Colors.blue[700], size: 40),
-              const SizedBox(width: 15),
-            ],
+            Icon(icon, color: iconColor, size: 24),
+            const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,51 +351,52 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                   Text(
                     label,
                     style: GoogleFonts.poppins(
-                      color: darkBlue.withOpacity(0.6),
-                      fontSize: 14,
+                      color: Colors.grey[500],
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
-                    title,
+                    address,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 16,
+                      color: isPlaceholder ? Colors.grey[400] : darkBlue,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    subtitle,
+                    sub,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 13,
+                      color: Colors.grey[500],
+                      fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFF000080)),
+            Icon(Icons.map_rounded, color: darkBlue.withOpacity(0.3), size: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFareRow(String label, String amount, Color darkBlue) {
+  Widget _buildFareRow(String label, String amount) {
+    const Color darkBlue = Color(0xFF000080);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: GoogleFonts.poppins(
-              color: darkBlue,
-              fontSize: 20,
+              color: Colors.grey[600],
+              fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -313,8 +404,8 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
             amount,
             style: GoogleFonts.poppins(
               color: darkBlue,
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],

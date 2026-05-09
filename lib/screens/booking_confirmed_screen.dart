@@ -23,13 +23,15 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-        } else {
-          _timer?.cancel();
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (_remainingSeconds > 0) {
+            _remainingSeconds--;
+          } else {
+            _timer?.cancel();
+          }
+        });
+      }
     });
   }
 
@@ -46,6 +48,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
   }
 
   void _showCancellationDialog() {
+    const Color darkBlue = Color(0xFF000080);
     String? selectedReason = 'Change of plans';
     final TextEditingController otherReasonController = TextEditingController();
 
@@ -55,28 +58,25 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              titlePadding: const EdgeInsets.all(0),
-              title: Container(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black12)),
-                ),
-                child: Center(
-                  child: Text(
-                    'Select Cancellation Reason',
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF0D47A1),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              title: Text(
+                'Cancel Ride',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: darkBlue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
                 ),
               ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text(
+                      'Please select a reason',
+                      style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+                    ),
+                    const SizedBox(height: 15),
                     _buildRadioOption('Change of plans', selectedReason, (val) {
                       setDialogState(() => selectedReason = val);
                     }),
@@ -94,45 +94,49 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                         padding: const EdgeInsets.only(top: 10),
                         child: TextField(
                           controller: otherReasonController,
+                          style: GoogleFonts.poppins(fontSize: 14),
                           decoration: InputDecoration(
-                            hintText: '(Please specify)',
-                            prefixText: 'Other reason: ',
-                            prefixStyle: GoogleFonts.poppins(color: Colors.black87, fontSize: 14),
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            hintText: 'Please specify...',
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                           ),
                         ),
                       ),
                   ],
                 ),
               ),
-              actionsPadding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+              actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               actions: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DashboardScreen(initialIndex: 1),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Keep Ride', style: GoogleFonts.poppins(color: Colors.grey[600])),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const DashboardScreen(initialIndex: 1)),
+                            (route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        (route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        child: Text('Cancel', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                      ),
                     ),
-                    child: Text(
-                      'Confirm Cancel',
-                      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                  ],
                 ),
               ],
             );
@@ -143,6 +147,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
   }
 
   Widget _buildRadioOption(String value, String? groupValue, Function(String?) onChanged) {
+    const Color darkBlue = Color(0xFF000080);
     return InkWell(
       onTap: () => onChanged(value),
       child: Row(
@@ -150,15 +155,14 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
           Radio<String>(
             value: value,
             groupValue: groupValue,
-            activeColor: const Color(0xFFE91E63), // Pinkish red like image
+            activeColor: darkBlue,
             onChanged: onChanged,
           ),
           Text(
             value,
             style: GoogleFonts.poppins(
-              color: const Color(0xFF0D47A1),
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+              color: Colors.grey[800],
+              fontSize: 15,
             ),
           ),
         ],
@@ -169,74 +173,112 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
-    const Color backgroundColor = Color(0xFFBEEBFF);
-    const Color confirmGreen = Color(0xFF00C853);
-    const Color chatBlue = Color(0xFF2196F3);
-
+    const Color backgroundColor = Color(0xFFF8F9FA);
     bool isCancelDisabled = _remainingSeconds == 0;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top bar
+          // Modern Header synchronized with Dashboard
           Container(
-            height: 120,
+            height: 180,
             width: double.infinity,
-            color: darkBlue,
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  'Booking Confirmed',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.check_circle_rounded,
+                        size: 60,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'BOOKED!',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
+                  const Icon(Icons.delivery_dining_rounded, color: darkBlue, size: 50),
                   const SizedBox(height: 10),
                   Text(
-                    'Booking is on the Way!',
+                    'On the Way!',
                     style: GoogleFonts.poppins(
                       color: darkBlue,
-                      fontSize: 26,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 5),
                   Text(
-                    'A driver is on the way to pick you up',
+                    'Your driver is approaching your location',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
-                      color: darkBlue.withOpacity(0.7),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                      fontSize: 14,
                     ),
                   ),
                   
@@ -251,7 +293,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -261,101 +303,47 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                       children: [
                         Row(
                           children: [
-                            // Driver Avatar
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: backgroundColor,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: darkBlue, width: 2),
-                              ),
-                              child: const Icon(Icons.person, size: 50, color: darkBlue),
-                            ),
-                            const SizedBox(width: 20),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Juan Dela Cruz',
-                                  style: GoogleFonts.poppins(
-                                    color: darkBlue,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'ABC 7034',
-                                  style: GoogleFonts.poppins(
-                                    color: darkBlue.withOpacity(0.6),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        
-                        const Divider(height: 30, thickness: 1),
-                        
-                        // Mobile Number
-                        Row(
-                          children: [
-                            Text(
-                              'Mobile number: ',
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey[700],
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              '09120456769',
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 25),
-                        
-                        // Contact Buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: const Icon(Icons.call),
-                                label: const Text('Call'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: confirmGreen,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                              ),
+                            CircleAvatar(
+                              radius: 35,
+                              backgroundColor: darkBlue.withOpacity(0.05),
+                              child: const Icon(Icons.person_rounded, size: 40, color: darkBlue),
                             ),
                             const SizedBox(width: 15),
                             Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: const Icon(Icons.chat_bubble),
-                                label: const Text('Chat'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: chatBlue,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Juan Dela Cruz',
+                                    style: GoogleFonts.poppins(
+                                      color: darkBlue,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    'PLATE: ABC 7034',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.grey[500],
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                          ],
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Divider(height: 1, color: Color(0xFFF5F5F5)),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildActionButton(Icons.call_rounded, 'Call', Colors.green),
+                            _buildActionButton(Icons.chat_bubble_rounded, 'Chat', Colors.blue),
                           ],
                         ),
                       ],
@@ -364,7 +352,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                   
                   const SizedBox(height: 40),
                   
-                  // Done Button
+                  // DONE Button
                   SizedBox(
                     width: double.infinity,
                     height: 60,
@@ -372,23 +360,22 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const PaymentScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const PaymentScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: confirmGreen,
+                        backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
                       ),
                       child: Text(
-                        'Done',
+                        'I HAVE ARRIVED',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
@@ -396,53 +383,84 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                   
                   const SizedBox(height: 15),
 
-                  // Cancel Ride Button with Timer
+                  // Cancel Ride Section
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       SizedBox(
                         width: double.infinity,
-                        height: 60,
-                        child: ElevatedButton(
-                          onPressed: isCancelDisabled
-                              ? null
-                              : () {
-                                  _showCancellationDialog();
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isCancelDisabled ? Colors.grey : darkBlue,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: Colors.grey[400],
-                            disabledForegroundColor: Colors.white70,
+                        height: 55,
+                        child: TextButton(
+                          onPressed: isCancelDisabled ? null : _showCancellationDialog,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.redAccent,
+                            disabledForegroundColor: Colors.grey[300],
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                              borderRadius: BorderRadius.circular(18),
+                              side: BorderSide(color: isCancelDisabled ? Colors.transparent : Colors.redAccent.withOpacity(0.1)),
                             ),
                           ),
                           child: Text(
-                            'Cancel Ride',
+                            'CANCEL RIDE',
                             style: GoogleFonts.poppins(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ),
                       ),
                       if (!isCancelDisabled)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8, right: 10),
-                          child: Text(
-                            'Cancel available for: ${_formatTime(_remainingSeconds)}',
-                            style: GoogleFonts.poppins(
-                              color: darkBlue.withOpacity(0.8),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.timer_outlined, size: 14, color: Colors.grey[500]),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Available for: ${_formatTime(_remainingSeconds)}',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                     ],
                   ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(IconData icon, String label, Color color) {
+    const Color darkBlue = Color(0xFF000080);
+    return InkWell(
+      onTap: () {},
+      borderRadius: BorderRadius.circular(15),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              color: darkBlue,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

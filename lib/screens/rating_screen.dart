@@ -10,7 +10,7 @@ class RatingScreen extends StatefulWidget {
 }
 
 class _RatingScreenState extends State<RatingScreen> {
-  int _selectedRating = 4; // Default to 4 as in image
+  int _selectedRating = 5;
   final TextEditingController _commentController = TextEditingController();
 
   @override
@@ -19,78 +19,182 @@ class _RatingScreenState extends State<RatingScreen> {
     super.dispose();
   }
 
+  void _showConfirmationDialog() {
+    const Color darkBlue = Color(0xFF000080);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          title: Text(
+            'Confirm Submission',
+            style: GoogleFonts.poppins(color: darkBlue, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to submit your rating for this trip?',
+            style: GoogleFonts.poppins(color: Colors.grey[600]),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.redAccent)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardScreen(initialIndex: 1),
+                  ),
+                  (route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: darkBlue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text('Submit', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
-    const Color backgroundColor = Color(0xFFBEEBFF);
-    const Color submitGreen = Color(0xFF81D45A); // Light green for Submit button
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top bar
+          // Modern Header synchronized with Dashboard
           Container(
-            height: 120,
+            height: 180,
             width: double.infinity,
-            color: darkBlue,
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.star_rounded,
+                        size: 60,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'RATE RIDER',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button on Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  Text(
-                    'Rate Rider',
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF1A237E), // Slightly lighter dark blue
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  
                   // Profile & Rating Card
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
                         const SizedBox(height: 30),
                         // Avatar
                         Container(
-                          width: 120,
-                          height: 120,
-                          decoration: const BoxDecoration(
-                            color: Colors.black,
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            border: Border.all(color: darkBlue.withOpacity(0.1), width: 4),
                           ),
-                          child: const Icon(Icons.person, size: 80, color: Colors.white),
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: darkBlue.withOpacity(0.05),
+                            child: const Icon(Icons.person_rounded, size: 60, color: darkBlue),
+                          ),
                         ),
                         
                         const SizedBox(height: 15),
@@ -99,52 +203,58 @@ class _RatingScreenState extends State<RatingScreen> {
                           'Joross Buera',
                           style: GoogleFonts.poppins(
                             color: darkBlue,
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          'TTG-8389',
+                          'PLATE NUMBER: TTG-8389',
                           style: GoogleFonts.poppins(
-                            color: darkBlue.withOpacity(0.8),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[500],
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 25),
                         const Divider(height: 1),
                         
                         // Rating Section
                         Container(
                           padding: const EdgeInsets.all(25),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE1F5FE).withOpacity(0.5),
+                            color: darkBlue.withOpacity(0.02),
                             borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
+                              bottomLeft: Radius.circular(25),
+                              bottomRight: Radius.circular(25),
                             ),
                           ),
                           child: Column(
                             children: [
+                              Text(
+                                'How was your trip?',
+                                style: GoogleFonts.poppins(
+                                  color: darkBlue.withOpacity(0.6),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
                               // Stars
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: List.generate(5, (index) {
                                   return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedRating = index + 1;
-                                      });
-                                    },
+                                    onTap: () => setState(() => _selectedRating = index + 1),
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 5),
                                       child: Icon(
-                                        Icons.star,
+                                        Icons.star_rounded,
                                         size: 45,
                                         color: index < _selectedRating
-                                            ? const Color(0xFFFFD54F) // Yellow
-                                            : Colors.grey[300], // Grey
+                                            ? const Color(0xFFFFD54F)
+                                            : Colors.grey[300],
                                       ),
                                     ),
                                   );
@@ -158,24 +268,18 @@ class _RatingScreenState extends State<RatingScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Colors.grey[200]!),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 15),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.chat_bubble_outline, color: Colors.grey),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _commentController,
-                                        decoration: InputDecoration(
-                                          hintText: 'Add a comment...',
-                                          hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                                          border: InputBorder.none,
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                child: TextField(
+                                  controller: _commentController,
+                                  maxLines: 4,
+                                  style: GoogleFonts.poppins(fontSize: 14, height: 1.4),
+                                  decoration: InputDecoration(
+                                    hintText: 'Add a comment about your ride...',
+                                    hintStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 13),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.all(15),
+                                  ),
                                 ),
                               ),
                             ],
@@ -190,66 +294,27 @@ class _RatingScreenState extends State<RatingScreen> {
                   // Submit Button
                   SizedBox(
                     width: double.infinity,
-                    height: 65,
+                    height: 60,
                     child: ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(
-                                'Confirm',
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-                              ),
-                              content: Text(
-                                'Are you sure you want to submit your rating for this trip?',
-                                style: GoogleFonts.poppins(),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    'Cancel',
-                                    style: GoogleFonts.poppins(color: Colors.red),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const DashboardScreen(initialIndex: 1),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  },
-                                  child: Text(
-                                    'Submit',
-                                    style: GoogleFonts.poppins(color: Colors.green, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
+                      onPressed: _showConfirmationDialog,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: submitGreen,
+                        backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                         elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
                       ),
                       child: Text(
                         'SUBMIT RATING',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

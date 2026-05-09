@@ -9,111 +9,186 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
-    const Color backgroundColor = Color(0xFFBEEBFF);
-    const Color payBlue = Color(0xFF5E92FF);
+    const Color backgroundColor = Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top bar
+          // Modern Header synchronized with Dashboard
           Container(
-            height: 120,
+            height: 180,
             width: double.infinity,
-            color: darkBlue,
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  'Trip Completed',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.payments_rounded,
+                        size: 60,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'PAYMENT',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 40.0),
+              padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // Status Header with Checkmark
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const Divider(thickness: 1.5, color: Colors.grey),
-                      Container(
-                        width: 70,
-                        height: 70,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF81C784), // Light green
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.check, color: Colors.white, size: 45),
-                      ),
-                    ],
+                  const SizedBox(height: 10),
+                  // Success Badge
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.check_circle_rounded, color: Colors.green, size: 80),
                   ),
-                  
-                  const SizedBox(height: 25),
-                  
+                  const SizedBox(height: 20),
                   Text(
-                    'Please pay the fare',
+                    'Trip Completed!',
                     style: GoogleFonts.poppins(
                       color: darkBlue,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'You have arrived at your destination',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey[600],
+                      fontSize: 14,
                     ),
                   ),
                   
                   const SizedBox(height: 40),
                   
-                  Text(
-                    'Amount to Pay',
-                    style: GoogleFonts.poppins(
-                      color: darkBlue.withOpacity(0.8),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
+                  // Payment Card
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(30),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'TOTAL FARE',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          '₱300',
+                          style: GoogleFonts.poppins(
+                            color: darkBlue,
+                            fontSize: 48,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Divider(height: 1, color: Color(0xFFF5F5F5)),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.payments_outlined, color: Colors.green, size: 20),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Please pay the driver in cash',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey[600],
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  
-                  const SizedBox(height: 10),
-                  
-                  Text(
-                    'PHP 300',
-                    style: GoogleFonts.poppins(
-                      color: darkBlue,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  const Divider(thickness: 1.2, color: Colors.grey),
-                  const SizedBox(height: 30),
                   
                   const SizedBox(height: 50),
                   
-                  // Rate Rider Button
+                  // RATE RIDER Button
                   SizedBox(
                     width: double.infinity,
                     height: 60,
@@ -121,23 +196,22 @@ class PaymentScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const RatingScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const RatingScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5E92FF), // light blue
+                        backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
                       ),
                       child: Text(
-                        'Rate Rider',
+                        'RATE RIDER',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
@@ -145,7 +219,7 @@ class PaymentScreen extends StatelessWidget {
                   
                   const SizedBox(height: 15),
 
-                  // Book Again Button
+                  // BOOK AGAIN Button
                   SizedBox(
                     width: double.infinity,
                     height: 60,
@@ -160,19 +234,21 @@ class PaymentScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
                       ),
                       child: Text(
-                        'Book Again',
+                        'BOOK AGAIN',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

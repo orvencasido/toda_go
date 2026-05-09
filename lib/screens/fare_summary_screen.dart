@@ -15,151 +15,232 @@ class FareSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
-    const Color backgroundColor = Color(0xFFBEEBFF);
-    const Color confirmGreen = Color(0xFF00C853);
+    const Color backgroundColor = Color(0xFFF8F9FA);
     int totalFare = tripFare + doorToDoorFare;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Top bar
+          // Modern Header synchronized with Dashboard
           Container(
-            height: 120,
+            height: 180,
             width: double.infinity,
-            color: darkBlue,
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF81D4FA), // Cyan/Light Blue circle
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  'Estimated Fare',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  darkBlue,
+                  Color(0xFF1A237E),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  // Left-aligned Logo consistent with Dashboard
+                  Container(
+                    height: 115,
+                    width: 115,
+                    padding: const EdgeInsets.all(5),
+                    child: Image.asset(
+                      'assets/images/toda_go_white.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.receipt_long_rounded,
+                        size: 60,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  // Branding & Title
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'TODA GO',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'FARE SUMMARY',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Back Button on Right Side
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(25.0),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // Map Route Preview Card
+                  // Route Preview Card
                   Container(
                     width: double.infinity,
-                    height: 220,
+                    height: 180,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(25),
                       child: Stack(
                         children: [
-                          // Simulated Map Background with Route
                           CustomPaint(
-                            size: const Size(double.infinity, 220),
+                            size: const Size(double.infinity, 180),
                             painter: MapRoutePainter(),
                           ),
-                          // Pick-up Pin
-                          const Positioned(
-                            top: 100,
-                            left: 40,
-                            child: Icon(Icons.location_on, color: Colors.blue, size: 40),
+                          const Center(
+                            child: Icon(Icons.map_rounded, color: Colors.white24, size: 80),
                           ),
-                          // Drop-off Pin
-                          const Positioned(
-                            bottom: 60,
-                            right: 50,
-                            child: Icon(Icons.location_on, color: Colors.purple, size: 40),
+                          Positioned(
+                            top: 40,
+                            left: 40,
+                            child: _buildMapPin(Icons.my_location_rounded, Colors.blue),
+                          ),
+                          Positioned(
+                            bottom: 40,
+                            right: 40,
+                            child: _buildMapPin(Icons.location_on_rounded, Colors.redAccent),
                           ),
                         ],
                       ),
                     ),
                   ),
                   
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
                   
-                  // Fare Details Card
+                  // Fare Breakdown Card
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                          child: Text(
-                            'Estimated Fare',
-                            style: GoogleFonts.poppins(
-                              color: darkBlue,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const Divider(height: 1, thickness: 1.5, color: Color(0xFFE1F5FE)),
-                        
-                        // Main Total Display
+                        // Header section with Total
                         Container(
+                          padding: const EdgeInsets.all(25),
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-                          child: Text(
-                            'PHP $totalFare',
-                            style: GoogleFonts.poppins(
-                              color: darkBlue,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w500,
+                          decoration: BoxDecoration(
+                            color: darkBlue.withOpacity(0.02),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25),
                             ),
                           ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'TOTAL FARE',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '₱${totalFare.toStringAsFixed(0)}',
+                                style: GoogleFonts.poppins(
+                                  color: darkBlue,
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const Divider(height: 1, thickness: 1.5, color: Color(0xFFE1F5FE)),
+                        const Divider(height: 1),
                         
-                        // Breakdown
+                        // Breakdown Rows
                         Padding(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(25),
                           child: Column(
                             children: [
-                              _buildFareRow('Round Trip Fare :', 'PHP $tripFare', darkBlue),
-                              const SizedBox(height: 15),
-                              _buildFareRow('Door-to-Door:', 'PHP $doorToDoorFare', darkBlue),
+                              _buildSummaryRow('Trip Base Fare', '₱$tripFare'),
+                              const SizedBox(height: 16),
+                              _buildSummaryRow('Service Fee', '₱$doorToDoorFare'),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Divider(height: 1, color: Color(0xFFF5F5F5)),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.payment_rounded, color: darkBlue, size: 20),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Cash Payment',
+                                    style: GoogleFonts.poppins(
+                                      color: darkBlue,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -167,12 +248,12 @@ class FareSummaryScreen extends StatelessWidget {
                     ),
                   ),
                   
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 40),
                   
-                  // Find Tricycle Button
+                  // FIND TRICYCLE Button
                   SizedBox(
-                    width: 260,
-                    height: 58,
+                    width: double.infinity,
+                    height: 60,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -183,22 +264,25 @@ class FareSummaryScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: confirmGreen,
+                        backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                         elevation: 4,
+                        shadowColor: darkBlue.withOpacity(0.3),
                       ),
                       child: Text(
-                        'Find Tricycle',
+                        'FIND TRICYCLE',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -208,24 +292,36 @@ class FareSummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFareRow(String label, String value, Color darkBlue) {
+  Widget _buildMapPin(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4)],
+      ),
+      child: Icon(icon, color: color, size: 28),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, String amount) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: GoogleFonts.poppins(
-            color: darkBlue,
-            fontSize: 20,
+            color: Colors.grey[600],
+            fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
         ),
         Text(
-          value,
+          amount,
           style: GoogleFonts.poppins(
-            color: darkBlue,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
+            color: const Color(0xFF000080),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -233,45 +329,33 @@ class FareSummaryScreen extends StatelessWidget {
   }
 }
 
-// Simple painter to simulate a map with roads and a route
 class MapRoutePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paintRoad = Paint()
-      ..color = Colors.grey[200]!
+      ..color = Colors.grey[100]!
       ..style = PaintingStyle.fill;
     
     final paintPark = Paint()
-      ..color = Colors.green[200]!
+      ..color = const Color(0xFFE8F5E9)
       ..style = PaintingStyle.fill;
 
-    // Draw some roads
-    canvas.drawRect(Rect.fromLTWH(0, 40, size.width, 25), paintRoad);
-    canvas.drawRect(Rect.fromLTWH(60, 0, 30, size.height), paintRoad);
-    canvas.drawRect(Rect.fromLTWH(180, 0, 25, size.height), paintRoad);
-    canvas.drawRect(Rect.fromLTWH(0, 150, size.width, 20), paintRoad);
+    canvas.drawRect(Rect.fromLTWH(0, 60, size.width, 30), paintRoad);
+    canvas.drawRect(Rect.fromLTWH(size.width * 0.4, 0, 30, size.height), paintRoad);
+    canvas.drawRRect(RRect.fromLTRBR(10, 10, 100, 50, const Radius.circular(10)), paintPark);
+    canvas.drawRRect(RRect.fromLTRBR(size.width - 100, size.height - 50, size.width - 10, size.height - 10, const Radius.circular(10)), paintPark);
 
-    // Draw some parks
-    canvas.drawRRect(RRect.fromLTRBR(200, 10, size.width - 20, 90, const Radius.circular(15)), paintPark);
-    canvas.drawRRect(RRect.fromLTRBR(120, 110, 160, 190, const Radius.circular(15)), paintPark);
-
-    // Draw Route (dotted line)
     final paintRoute = Paint()
-      ..color = Colors.blue[800]!
-      ..strokeWidth = 4
+      ..color = const Color(0xFF000080)
+      ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
     
     final path = Path();
-    path.moveTo(60, 120);
-    path.lineTo(120, 120);
-    path.lineTo(150, 80);
-    path.lineTo(200, 130);
-    path.lineTo(260, 130);
+    path.moveTo(40, 40);
+    path.quadraticBezierTo(size.width * 0.5, 40, size.width * 0.5, size.height * 0.5);
+    path.quadraticBezierTo(size.width * 0.5, size.height - 40, size.width - 40, size.height - 40);
 
-    // Simulated dotted path
-    for (double i = 0; i < 1.0; i += 0.05) {
-      canvas.drawCircle(Offset(60 + (200 * i), 120 - (20 * (i * 3))), 3, paintRoute);
-    }
+    canvas.drawPath(path, paintRoute);
   }
 
   @override
