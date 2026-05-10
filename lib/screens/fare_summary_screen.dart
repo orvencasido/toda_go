@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/booking_service.dart';
 import '../services/auth_service.dart';
 import '../models/booking_model.dart';
+import 'searching_tricycle_screen.dart';
 
 class FareSummaryScreen extends StatefulWidget {
   final int tripFare;
@@ -261,7 +262,7 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '₱${totalFare.toStringAsFixed(0)}',
+                                'PHP ${totalFare.toStringAsFixed(0)}',
                                 style: GoogleFonts.poppins(
                                   color: darkBlue,
                                   fontSize: 42,
@@ -278,9 +279,9 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
                           padding: const EdgeInsets.all(25),
                           child: Column(
                             children: [
-                              _buildSummaryRow('Trip Base Fare', '₱${widget.tripFare}'),
+                              _buildSummaryRow('Trip Base Fare', 'PHP ${widget.tripFare}'),
                               const SizedBox(height: 16),
-                              _buildSummaryRow('Service Fee', '₱${widget.doorToDoorFare}'),
+                              _buildSummaryRow('Service Fee', 'PHP ${widget.doorToDoorFare}'),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 20),
                                 child: Divider(height: 1, color: Color(0xFFF5F5F5)),
@@ -341,15 +342,6 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
                           ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
                   const SizedBox(height: 20),
                 ],
               ),
