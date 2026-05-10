@@ -286,6 +286,8 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                             builder: (context) => FareSummaryScreen(
                               tripFare: _tripFare,
                               doorToDoorFare: _doorToDoorFare,
+                              pickupAddress: _pickupAddress,
+                              dropoffAddress: _dropoffAddress,
                             ),
                           ),
                         );

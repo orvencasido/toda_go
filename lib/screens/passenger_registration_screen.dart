@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'login_screen.dart';
+import '../services/auth_service.dart';
+import 'dashboard_screen.dart';
 
 class PassengerRegistrationScreen extends StatefulWidget {
   const PassengerRegistrationScreen({super.key});
@@ -12,12 +13,62 @@ class PassengerRegistrationScreen extends StatefulWidget {
 class _PassengerRegistrationScreenState extends State<PassengerRegistrationScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
 
   final _nameController = TextEditingController();
   final _contactController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  Future<void> _handleRegister() async {
+    if (_nameController.text.isEmpty || 
+        _contactController.text.isEmpty || 
+        _emailController.text.isEmpty || 
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    String? error = await _authService.signUp(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+      fullName: _nameController.text.trim(),
+      phoneNumber: _contactController.text.trim(),
+      passengerType: 'Regular', // Default for now
+    );
+
+    setState(() => _isLoading = false);
+
+    if (error == null) {
+      // Registration successful, navigate to Dashboard
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          (route) => false,
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -151,7 +202,7 @@ class _PassengerRegistrationScreenState extends State<PassengerRegistrationScree
                         const SizedBox(height: 15),
                         _RegisterTextField(
                           controller: _emailController,
-                          hint: 'Email (Optional)',
+                          hint: 'Email',
                           prefixIcon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -192,12 +243,7 @@ class _PassengerRegistrationScreenState extends State<PassengerRegistrationScree
                           width: double.infinity,
                           height: 55,
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                              );
-                            },
+                            onPressed: _isLoading ? null : _handleRegister,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: darkBlue,
                               foregroundColor: Colors.white,
@@ -206,14 +252,20 @@ class _PassengerRegistrationScreenState extends State<PassengerRegistrationScree
                               ),
                               elevation: 0,
                             ),
-                            child: Text(
-                              'SIGN UP',
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
+                            child: _isLoading 
+                              ? const SizedBox(
+                                  height: 20, 
+                                  width: 20, 
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                                )
+                              : Text(
+                                  'SIGN UP',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
                           ),
                         ),
                       ],

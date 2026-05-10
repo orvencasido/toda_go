@@ -1,22 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'searching_tricycle_screen.dart';
+import '../services/booking_service.dart';
+import '../services/auth_service.dart';
+import '../models/booking_model.dart';
 
-class FareSummaryScreen extends StatelessWidget {
+class FareSummaryScreen extends StatefulWidget {
   final int tripFare;
   final int doorToDoorFare;
+  final String pickupAddress;
+  final String dropoffAddress;
 
   const FareSummaryScreen({
     super.key,
     required this.tripFare,
     required this.doorToDoorFare,
+    required this.pickupAddress,
+    required this.dropoffAddress,
   });
+
+  @override
+  State<FareSummaryScreen> createState() => _FareSummaryScreenState();
+}
+
+class _FareSummaryScreenState extends State<FareSummaryScreen> {
+  bool _isLoading = false;
+  final BookingService _bookingService = BookingService();
+  final AuthService _authService = AuthService();
+
+  Future<void> _handleFindTricycle() async {
+    final user = _authService.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    double totalFare = (widget.tripFare + widget.doorToDoorFare).toDouble();
+
+    Booking newBooking = Booking(
+      id: '', // Will be set by Firestore
+      passengerId: user.uid,
+      pickupAddress: widget.pickupAddress,
+      dropoffAddress: widget.dropoffAddress,
+      fare: totalFare,
+      status: BookingStatus.pending,
+      createdAt: DateTime.now(),
+    );
+
+    String? bookingId = await _bookingService.createBooking(newBooking);
+
+    setState(() => _isLoading = false);
+
+    if (bookingId != null) {
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchingTricycleScreen(bookingId: bookingId),
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to create booking. Please try again.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
     const Color backgroundColor = Color(0xFFF8F9FA);
-    int totalFare = tripFare + doorToDoorFare;
+    int totalFare = widget.tripFare + widget.doorToDoorFare;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -218,9 +278,9 @@ class FareSummaryScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(25),
                           child: Column(
                             children: [
-                              _buildSummaryRow('Trip Base Fare', '₱$tripFare'),
+                              _buildSummaryRow('Trip Base Fare', '₱${widget.tripFare}'),
                               const SizedBox(height: 16),
-                              _buildSummaryRow('Service Fee', '₱$doorToDoorFare'),
+                              _buildSummaryRow('Service Fee', '₱${widget.doorToDoorFare}'),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 20),
                                 child: Divider(height: 1, color: Color(0xFFF5F5F5)),
@@ -255,14 +315,7 @@ class FareSummaryScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 60,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SearchingTricycleScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: _isLoading ? null : _handleFindTricycle,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
@@ -272,16 +325,31 @@ class FareSummaryScreen extends StatelessWidget {
                         elevation: 4,
                         shadowColor: darkBlue.withOpacity(0.3),
                       ),
-                      child: Text(
-                        'FIND TRICYCLE',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
+                      child: _isLoading 
+                        ? const SizedBox(
+                            height: 25, 
+                            width: 25, 
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)
+                          )
+                        : Text(
+                            'FIND TRICYCLE',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
                   const SizedBox(height: 20),
                 ],
               ),

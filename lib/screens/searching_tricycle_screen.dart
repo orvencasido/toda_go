@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/booking_service.dart';
+import '../models/booking_model.dart';
 import 'booking_confirmed_screen.dart';
 import 'history_screen.dart';
 import 'dashboard_screen.dart';
 
 class SearchingTricycleScreen extends StatefulWidget {
-  const SearchingTricycleScreen({super.key});
+  final String bookingId;
+  const SearchingTricycleScreen({super.key, required this.bookingId});
 
   @override
   State<SearchingTricycleScreen> createState() => _SearchingTricycleScreenState();
@@ -18,11 +21,37 @@ class _SearchingTricycleScreenState extends State<SearchingTricycleScreen> with 
   Animation<double>? _radarOpacityAnimation;
   String _dots = '';
   late Timer _dotsTimer;
+  StreamSubscription? _bookingSubscription;
+  final BookingService _bookingService = BookingService();
 
   @override
   void initState() {
     super.initState();
     
+    // Listen to booking status changes
+    _bookingSubscription = _bookingService.streamBooking(widget.bookingId).listen((booking) {
+      if (booking != null) {
+        if (booking.status == BookingStatus.accepted) {
+          if (mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BookingConfirmedScreen(),
+              ),
+              (route) => route.isFirst,
+            );
+          }
+        } else if (booking.status == BookingStatus.cancelled) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Booking was cancelled')),
+            );
+            Navigator.pop(context);
+          }
+        }
+      }
+    });
+
     // Initialize Radar Pulse Controller
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 2000),
@@ -57,6 +86,7 @@ class _SearchingTricycleScreenState extends State<SearchingTricycleScreen> with 
   void dispose() {
     _pulseController?.dispose();
     _dotsTimer.cancel();
+    _bookingSubscription?.cancel();
     super.dispose();
   }
 
@@ -135,13 +165,16 @@ class _SearchingTricycleScreenState extends State<SearchingTricycleScreen> with 
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const DashboardScreen(initialIndex: 1)),
-                        (route) => false,
-                      );
+                    onPressed: () async {
+                      await _bookingService.cancelBooking(widget.bookingId);
+                      if (mounted) {
+                        Navigator.pop(context); // Close dialog
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const DashboardScreen(initialIndex: 1)),
+                          (route) => false,
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
@@ -326,39 +359,6 @@ class _SearchingTricycleScreenState extends State<SearchingTricycleScreen> with 
                   
                   const SizedBox(height: 80),
                   
-                  // CONTINUE Button (Simulating a found driver)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const BookingConfirmedScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: darkBlue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        elevation: 4,
-                        shadowColor: darkBlue.withOpacity(0.3),
-                      ),
-                      child: Text(
-                        'CONTINUE',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
                   // CANCEL BOOKING Button
                   SizedBox(
                     width: double.infinity,
