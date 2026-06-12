@@ -1,16 +1,27 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 
+/// Simple in-memory user session — local auth state manager.
+class AppSession {
+  static AppUser? _currentUser;
+
+  static AppUser? get currentUser => _currentUser;
+
+  static void setUser(AppUser? user) => _currentUser = user;
+
+  static String? get currentUid => _currentUser?.uid;
+}
+
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  // In-memory user store: uid -> AppUser
+  static final Map<String, AppUser> _users = {};
 
-  // Get current user
-  User? get currentUser => _auth.currentUser;
+  // Convenience getter matching the former auth API shape
+  AppUser? get currentUser => AppSession.currentUser;
 
-  // Stream of auth changes
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  // Stream of auth changes (simplified — emits once on call)
+  Stream<AppUser?> get authStateChanges async* {
+    yield AppSession.currentUser;
+  }
 
   // Sign Up
   Future<String?> signUp({
@@ -20,63 +31,43 @@ class AuthService {
     required String phoneNumber,
     required String passengerType,
   }) async {
-    try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
-      User? user = result.user;
-      
-      if (user != null) {
-        // Create user document in Firestore
-        AppUser appUser = AppUser(
-          uid: user.uid,
-          email: email,
-          fullName: fullName,
-          phoneNumber: phoneNumber,
-          passengerType: passengerType,
-          createdAt: DateTime.now(),
-        );
-        
-        await _db.collection('users').doc(user.uid).set(appUser.toMap());
-        return null; // Success
-      }
-      return "User creation failed";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
-    } catch (e) {
-      return e.toString();
+    if (_users.values.any((u) => u.email == email)) {
+      return 'The email address is already in use.';
     }
+
+    final uid = DateTime.now().millisecondsSinceEpoch.toString();
+    final appUser = AppUser(
+      uid: uid,
+      email: email,
+      fullName: fullName,
+      phoneNumber: phoneNumber,
+      passengerType: passengerType,
+      createdAt: DateTime.now(),
+    );
+
+    _users[uid] = appUser;
+    AppSession.setUser(appUser);
+    return null; // Success
   }
 
   // Sign In
   Future<String?> signIn(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final user = _users.values.firstWhere((u) => u.email == email);
+      AppSession.setUser(user);
       return null; // Success
-    } on FirebaseAuthException catch (e) {
-      return e.message;
-    } catch (e) {
-      return e.toString();
+    } catch (_) {
+      return 'No account found for that email address.';
     }
   }
 
   // Sign Out
   Future<void> signOut() async {
-    await _auth.signOut();
+    AppSession.setUser(null);
   }
 
   // Get User Data
   Future<AppUser?> getUserData(String uid) async {
-    try {
-      DocumentSnapshot doc = await _db.collection('users').doc(uid).get();
-      if (doc.exists) {
-        return AppUser.fromMap(doc.data() as Map<String, dynamic>);
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
+    return _users[uid];
   }
 }

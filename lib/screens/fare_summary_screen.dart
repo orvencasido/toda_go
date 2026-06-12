@@ -42,7 +42,7 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
     double totalFare = (widget.tripFare + widget.doorToDoorFare).toDouble();
 
     Booking newBooking = Booking(
-      id: '', // Will be set by Firestore
+      id: '', // Will be assigned by BookingService
       passengerId: user.uid,
       pickupAddress: widget.pickupAddress,
       dropoffAddress: widget.dropoffAddress,
