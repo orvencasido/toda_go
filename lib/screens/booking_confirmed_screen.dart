@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/booking_model.dart';
+import '../services/booking_service.dart';
 import 'payment_screen.dart';
 import 'dashboard_screen.dart';
 import 'dart:async';
 
 class BookingConfirmedScreen extends StatefulWidget {
-  const BookingConfirmedScreen({super.key});
+  final String bookingId;
+  const BookingConfirmedScreen({super.key, required this.bookingId});
 
   @override
   State<BookingConfirmedScreen> createState() => _BookingConfirmedScreenState();
@@ -14,6 +17,7 @@ class BookingConfirmedScreen extends StatefulWidget {
 class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
   Timer? _timer;
   int _remainingSeconds = 180; // 3 minutes
+  final BookingService _bookingService = BookingService();
 
   @override
   void initState() {
@@ -356,13 +360,25 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 60,
-                    child: ElevatedButton(
-                      onPressed: () {
+                    child: StreamBuilder<Booking?>(
+                      stream: _bookingService.streamBooking(widget.bookingId),
+                      builder: (context, snapshot) {
+                        final booking = snapshot.data;
+                        final canPay = booking?.status == BookingStatus.droppedOff ||
+                            booking?.status == BookingStatus.paymentSent ||
+                            booking?.status == BookingStatus.completed;
+                        return ElevatedButton(
+                      onPressed: canPay ? () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const PaymentScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => PaymentScreen(
+                              bookingId: widget.bookingId,
+                              fare: booking?.fare ?? 0,
+                            ),
+                          ),
                         );
-                      },
+                      } : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: darkBlue,
                         foregroundColor: Colors.white,
@@ -371,13 +387,15 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                         shadowColor: darkBlue.withOpacity(0.3),
                       ),
                       child: Text(
-                        'I HAVE ARRIVED',
+                        canPay ? 'PAY CASH NOW' : _statusText(booking?.status),
                         style: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                         ),
                       ),
+                    );
+                      },
                     ),
                   ),
                   
@@ -466,5 +484,21 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
         ],
       ),
     );
+  }
+
+  String _statusText(BookingStatus? status) {
+    switch (status) {
+      case BookingStatus.accepted:
+        return 'RIDER IS ON THE WAY';
+      case BookingStatus.pickedUp:
+        return 'TRIP IN PROGRESS';
+      case BookingStatus.droppedOff:
+        return 'PAY CASH NOW';
+      case BookingStatus.paymentSent:
+      case BookingStatus.completed:
+        return 'PAYMENT SENT';
+      default:
+        return 'WAITING FOR RIDER';
+    }
   }
 }

@@ -17,23 +17,24 @@ class AppUser {
 
   Map<String, dynamic> toMap() {
     return {
-      'uid': uid,
+      'id': uid,
       'email': email,
-      'fullName': fullName,
-      'phoneNumber': phoneNumber,
-      'passengerType': passengerType,
-      'createdAt': createdAt.toIso8601String(),
+      'full_name': fullName,
+      'phone_number': phoneNumber,
+      'passenger_type': passengerType,
+      'role': 'passenger',
+      'created_at': createdAt.toIso8601String(),
     };
   }
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
-      uid: map['uid'] ?? '',
+      uid: map['id'] ?? map['uid'] ?? '',
       email: map['email'] ?? '',
-      fullName: map['fullName'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '',
-      passengerType: map['passengerType'] ?? 'Regular',
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+      fullName: map['full_name'] ?? map['fullName'] ?? '',
+      phoneNumber: map['phone_number'] ?? map['phoneNumber'] ?? '',
+      passengerType: map['passenger_type'] ?? map['passengerType'] ?? 'Regular',
+      createdAt: DateTime.parse(map['created_at'] ?? map['createdAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 }

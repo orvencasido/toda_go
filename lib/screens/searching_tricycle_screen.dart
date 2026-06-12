@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/booking_service.dart';
 import '../models/booking_model.dart';
 import 'booking_confirmed_screen.dart';
-import 'history_screen.dart';
 import 'dashboard_screen.dart';
 
 class SearchingTricycleScreen extends StatefulWidget {
@@ -36,7 +35,7 @@ class _SearchingTricycleScreenState extends State<SearchingTricycleScreen> with 
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => const BookingConfirmedScreen(),
+                builder: (context) => BookingConfirmedScreen(bookingId: widget.bookingId),
               ),
               (route) => route.isFirst,
             );

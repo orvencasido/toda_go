@@ -7,16 +7,24 @@ import 'searching_tricycle_screen.dart';
 
 class FareSummaryScreen extends StatefulWidget {
   final int tripFare;
-  final int doorToDoorFare;
   final String pickupAddress;
   final String dropoffAddress;
+  final double pickupLat;
+  final double pickupLng;
+  final double dropoffLat;
+  final double dropoffLng;
+  final double distanceKm;
 
   const FareSummaryScreen({
     super.key,
     required this.tripFare,
-    required this.doorToDoorFare,
     required this.pickupAddress,
     required this.dropoffAddress,
+    required this.pickupLat,
+    required this.pickupLng,
+    required this.dropoffLat,
+    required this.dropoffLng,
+    required this.distanceKm,
   });
 
   @override
@@ -39,13 +47,18 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
 
     setState(() => _isLoading = true);
 
-    double totalFare = (widget.tripFare + widget.doorToDoorFare).toDouble();
+    double totalFare = widget.tripFare.toDouble();
 
     Booking newBooking = Booking(
       id: '', // Will be assigned by BookingService
       passengerId: user.uid,
       pickupAddress: widget.pickupAddress,
       dropoffAddress: widget.dropoffAddress,
+      pickupLat: widget.pickupLat,
+      pickupLng: widget.pickupLng,
+      dropoffLat: widget.dropoffLat,
+      dropoffLng: widget.dropoffLng,
+      distanceKm: widget.distanceKm,
       fare: totalFare,
       status: BookingStatus.pending,
       createdAt: DateTime.now(),
@@ -77,7 +90,7 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
   Widget build(BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
     const Color backgroundColor = Color(0xFFF8F9FA);
-    int totalFare = widget.tripFare + widget.doorToDoorFare;
+    int totalFare = widget.tripFare;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -279,9 +292,9 @@ class _FareSummaryScreenState extends State<FareSummaryScreen> {
                           padding: const EdgeInsets.all(25),
                           child: Column(
                             children: [
-                              _buildSummaryRow('Trip Base Fare', 'PHP ${widget.tripFare}'),
+                              _buildSummaryRow('Distance', '${widget.distanceKm.toStringAsFixed(1)} km'),
                               const SizedBox(height: 16),
-                              _buildSummaryRow('Service Fee', 'PHP ${widget.doorToDoorFare}'),
+                              _buildSummaryRow('Fare', 'PHP ${widget.tripFare}'),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 20),
                                 child: Divider(height: 1, color: Color(0xFFF5F5F5)),

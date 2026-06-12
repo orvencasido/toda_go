@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' as math;
 import 'map_picker_screen.dart';
 import 'fare_summary_screen.dart';
 
@@ -15,21 +16,38 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
   String _pickupSub = 'Tap to choose on map';
   String _dropoffAddress = 'Select Drop-off Location';
   String _dropoffSub = 'Tap to choose on map';
+  double _pickupLat = 0;
+  double _pickupLng = 0;
+  double _dropoffLat = 0;
+  double _dropoffLng = 0;
   
   double _distance = 0.0;
   int _tripFare = 0;
-  int _doorToDoorFare = 100;
 
   void _calculateFare() {
     if (_pickupAddress != 'Select Pick-up Location' && _dropoffAddress != 'Select Drop-off Location') {
-      _distance = 6.5; 
+      _distance = _calculateDistanceKm(_pickupLat, _pickupLng, _dropoffLat, _dropoffLng);
       if (_distance <= 5) {
-        _tripFare = 15;
+        _tripFare = 20;
       } else {
-        _tripFare = 15 + ((_distance - 5).ceil() * 2);
+        _tripFare = 20 + ((_distance - 5).ceil() * 2);
       }
     }
   }
+
+  double _calculateDistanceKm(double lat1, double lon1, double lat2, double lon2) {
+    const earthRadiusKm = 6371.0;
+    final dLat = _degreesToRadians(lat2 - lat1);
+    final dLon = _degreesToRadians(lon2 - lon1);
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_degreesToRadians(lat1)) *
+            math.cos(_degreesToRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    return earthRadiusKm * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  }
+
+  double _degreesToRadians(double degrees) => degrees * math.pi / 180;
 
   @override
   Widget build(BuildContext context) {
@@ -164,10 +182,12 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                                 builder: (context) => const MapPickerScreen(title: 'Pick-up'),
                               ),
                             );
-                            if (result != null && result is Map<String, String>) {
+                            if (result != null && result is Map) {
                               setState(() {
-                                _pickupAddress = result['address']!;
-                                _pickupSub = result['sub']!;
+                                _pickupAddress = result['address'];
+                                _pickupSub = result['sub'];
+                                _pickupLat = result['lat'];
+                                _pickupLng = result['lng'];
                                 _calculateFare();
                               });
                             }
@@ -194,10 +214,12 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                                 builder: (context) => const MapPickerScreen(title: 'Drop-off'),
                               ),
                             );
-                            if (result != null && result is Map<String, String>) {
+                            if (result != null && result is Map) {
                               setState(() {
-                                _dropoffAddress = result['address']!;
-                                _dropoffSub = result['sub']!;
+                                _dropoffAddress = result['address'];
+                                _dropoffSub = result['sub'];
+                                _dropoffLat = result['lat'];
+                                _dropoffLng = result['lng'];
                                 _calculateFare();
                               });
                             }
@@ -240,7 +262,6 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                         const Divider(height: 1),
                         _buildFareRow('Trip Fare', '₱$_tripFare'),
                         const Divider(height: 1, indent: 20, endIndent: 20),
-                        _buildFareRow('Service Fee', '₱$_doorToDoorFare'),
                         
                         if (_distance > 0)
                           Padding(
@@ -285,9 +306,13 @@ class _PickupDropoffScreenState extends State<PickupDropoffScreen> {
                           MaterialPageRoute(
                             builder: (context) => FareSummaryScreen(
                               tripFare: _tripFare,
-                              doorToDoorFare: _doorToDoorFare,
                               pickupAddress: _pickupAddress,
                               dropoffAddress: _dropoffAddress,
+                              pickupLat: _pickupLat,
+                              pickupLng: _pickupLng,
+                              dropoffLat: _dropoffLat,
+                              dropoffLng: _dropoffLng,
+                              distanceKm: _distance,
                             ),
                           ),
                         );

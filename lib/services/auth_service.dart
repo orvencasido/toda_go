@@ -1,6 +1,6 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
 
-/// Simple in-memory user session — local auth state manager.
 class AppSession {
   static AppUser? _currentUser;
 
@@ -12,18 +12,20 @@ class AppSession {
 }
 
 class AuthService {
-  // In-memory user store: uid -> AppUser
-  static final Map<String, AppUser> _users = {};
+  final SupabaseClient _client = Supabase.instance.client;
 
-  // Convenience getter matching the former auth API shape
   AppUser? get currentUser => AppSession.currentUser;
 
-  // Stream of auth changes (simplified — emits once on call)
   Stream<AppUser?> get authStateChanges async* {
-    yield AppSession.currentUser;
+    final authUser = _client.auth.currentUser;
+    if (authUser == null) {
+      AppSession.setUser(null);
+      yield null;
+      return;
+    }
+    yield await getUserData(authUser.id);
   }
 
-  // Sign Up
   Future<String?> signUp({
     required String email,
     required String password,
@@ -31,43 +33,80 @@ class AuthService {
     required String phoneNumber,
     required String passengerType,
   }) async {
-    if (_users.values.any((u) => u.email == email)) {
-      return 'The email address is already in use.';
-    }
-
-    final uid = DateTime.now().millisecondsSinceEpoch.toString();
-    final appUser = AppUser(
-      uid: uid,
-      email: email,
-      fullName: fullName,
-      phoneNumber: phoneNumber,
-      passengerType: passengerType,
-      createdAt: DateTime.now(),
-    );
-
-    _users[uid] = appUser;
-    AppSession.setUser(appUser);
-    return null; // Success
-  }
-
-  // Sign In
-  Future<String?> signIn(String email, String password) async {
     try {
-      final user = _users.values.firstWhere((u) => u.email == email);
-      AppSession.setUser(user);
-      return null; // Success
-    } catch (_) {
-      return 'No account found for that email address.';
+      final response = await _client.auth.signUp(
+        email: email,
+        password: password,
+      );
+      final authUser = response.user;
+      if (authUser == null) return 'Could not create account.';
+
+      final appUser = AppUser(
+        uid: authUser.id,
+        email: email,
+        fullName: fullName,
+        phoneNumber: phoneNumber,
+        passengerType: passengerType,
+        createdAt: DateTime.now(),
+      );
+
+      await _client.from('profiles').upsert(appUser.toMap());
+      AppSession.setUser(appUser);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return 'Registration failed. Please try again.';
     }
   }
 
-  // Sign Out
+  Future<String?> signIn(String emailOrPhone, String password) async {
+    try {
+      var email = emailOrPhone;
+      if (!emailOrPhone.contains('@')) {
+        final profile = await _client
+            .from('profiles')
+            .select('email')
+            .eq('phone_number', emailOrPhone)
+            .eq('role', 'passenger')
+            .maybeSingle();
+        if (profile == null) return 'No account found for that contact number.';
+        email = profile['email'];
+      }
+
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      final authUser = response.user;
+      if (authUser == null) return 'Invalid login credentials.';
+
+      final appUser = await getUserData(authUser.id);
+      if (appUser == null) return 'Passenger profile was not found.';
+      AppSession.setUser(appUser);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (_) {
+      return 'Login failed. Please try again.';
+    }
+  }
+
   Future<void> signOut() async {
+    await _client.auth.signOut();
     AppSession.setUser(null);
   }
 
-  // Get User Data
   Future<AppUser?> getUserData(String uid) async {
-    return _users[uid];
+    final row = await _client
+        .from('profiles')
+        .select()
+        .eq('id', uid)
+        .eq('role', 'passenger')
+        .maybeSingle();
+    if (row == null) return null;
+    final user = AppUser.fromMap(row);
+    AppSession.setUser(user);
+    return user;
   }
 }

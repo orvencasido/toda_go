@@ -11,12 +11,13 @@ class MapPickerScreen extends StatelessWidget {
     const Color backgroundColor = Color(0xFFF8F9FA);
 
     // Simulated locations in Tayabas City
-    final List<Map<String, String>> tayabasLocations = [
-      {'address': 'Tayabas City Hall', 'sub': 'City Center, Tayabas'},
-      {'address': 'Minor Basilica of St. Michael', 'sub': 'San Roque St, Tayabas'},
-      {'address': 'Brgy. Baguio', 'sub': 'Ilaya-Tayabas, Quezon'},
-      {'address': 'Sa lumang court', 'sub': 'CTS De Tayabas, P. Norte'},
-      {'address': 'Tayabas Community Hospital', 'sub': 'Brgy. Wakas, Tayabas'},
+    final List<Map<String, dynamic>> tayabasLocations = [
+      {'address': 'Tayabas City Hall', 'sub': 'City Center, Tayabas, Quezon', 'lat': 14.0253, 'lng': 121.5929},
+      {'address': 'Minor Basilica of St. Michael', 'sub': 'San Roque St, Tayabas, Quezon', 'lat': 14.0269, 'lng': 121.5914},
+      {'address': 'Brgy. Baguio', 'sub': 'Ilaya-Tayabas, Quezon', 'lat': 14.0602, 'lng': 121.5578},
+      {'address': 'Tayabas Public Market', 'sub': 'J. P. Rizal St, Tayabas, Quezon', 'lat': 14.0238, 'lng': 121.5939},
+      {'address': 'Tayabas Community Hospital', 'sub': 'Brgy. Wakas, Tayabas, Quezon', 'lat': 14.0186, 'lng': 121.6023},
+      {'address': 'Malagonlong Bridge', 'sub': 'Tayabas, Quezon', 'lat': 14.0073, 'lng': 121.5873},
     ];
 
     return Scaffold(
@@ -220,7 +221,7 @@ class MapPickerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationSuggestion(Map<String, String> loc, BuildContext context) {
+  Widget _buildLocationSuggestion(Map<String, dynamic> loc, BuildContext context) {
     const Color darkBlue = Color(0xFF000080);
     return InkWell(
       onTap: () => Navigator.pop(context, loc),
@@ -248,7 +249,7 @@ class MapPickerScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    loc['address']!,
+                    loc['address'],
                     style: GoogleFonts.poppins(
                       color: darkBlue,
                       fontSize: 14,
@@ -256,7 +257,7 @@ class MapPickerScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    loc['sub']!,
+                    loc['sub'],
                     style: GoogleFonts.poppins(
                       color: Colors.grey[500],
                       fontSize: 11,
